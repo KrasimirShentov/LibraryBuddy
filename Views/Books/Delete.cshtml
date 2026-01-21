@@ -1,0 +1,16 @@
+﻿@model LibraryBuddy.Domain.Entities.Book
+@{
+    ViewData["Title"] = "Delete Book";
+}
+
+<h2>Delete Book</h2>
+
+<div class="alert alert-warning mt-3">
+    Are you sure you want to delete <b>@Model.Title</b> by <b>@Model.Author</b>?
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button class="btn btn-danger" type="submit">Yes, delete</button>
+    <a class="btn btn-secondary" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
+</form>

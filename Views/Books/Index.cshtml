@@ -1,0 +1,77 @@
+﻿@using LibraryBuddy.Domain.Enums
+@model LibraryBuddy.ViewModels.Books.BookListVm
+
+@{
+    ViewData["Title"] = "Books";
+}
+
+<h2>Books</h2>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input class="form-control" name="q" value="@Model.Filter.Q" placeholder="Search title/author..." />
+    </div>
+
+    <div class="col-md-3">
+        <select class="form-select" name="genre">
+            <option value="">All genres</option>
+            @foreach (var g in Model.Filter.Genres)
+            {
+                <option value="@g" selected="@(g == Model.Filter.Genre)">@g</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <select class="form-select" name="status">
+            <option value="">All status</option>
+            <option value="@BookStatus.Available" selected="@(Model.Filter.Status == BookStatus.Available)">Available</option>
+            <option value="@BookStatus.Loaned" selected="@(Model.Filter.Status == BookStatus.Loaned)">Loaned</option>
+        </select>
+    </div>
+
+    <div class="col-md-2 d-grid">
+        <button class="btn btn-primary" type="submit">Filter</button>
+    </div>
+</form>
+
+<p>
+    <a class="btn btn-success" asp-action="Create">+ Add Book</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Genre</th>
+            <th>Status</th>
+            <th style="width:260px;"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var b in Model.Items)
+        {
+            <tr>
+                <td>@b.Title</td>
+                <td>@b.Author</td>
+                <td>@b.Genre</td>
+                <td>@b.Status</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@b.Id">Details</a>
+                    <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@b.Id">Edit</a>
+                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@b.Id">Delete</a>
+
+                    @if (b.Status == BookStatus.Available)
+                    {
+                        <a class="btn btn-sm btn-success" asp-action="Loan" asp-route-id="@b.Id">Loan</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-sm btn-warning" asp-action="Return" asp-route-id="@b.Id">Return</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
