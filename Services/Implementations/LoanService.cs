@@ -31,7 +31,7 @@ public class LoanService : ILoanService
             throw new InvalidOperationException("Borrower name is required.");
 
         // Transaction to keep Book.Status and Loan in sync
-        await using var tx = await _db.Database.BeginTransactionAsync();
+        //await using var tx = await _db.Database.BeginTransactionAsync();
 
         var book = await _db.Books.FirstOrDefaultAsync(b => b.Id == bookId);
         if (book is null)
@@ -57,12 +57,12 @@ public class LoanService : ILoanService
         book.Status = BookStatus.Loaned;
 
         await _db.SaveChangesAsync();
-        await tx.CommitAsync();
+        //await tx.CommitAsync();
     }
 
     public async Task ReturnBookAsync(int bookId, DateOnly returnedOn)
     {
-        await using var tx = await _db.Database.BeginTransactionAsync();
+        //await using var tx = await _db.Database.BeginTransactionAsync();
 
         var book = await _db.Books.FirstOrDefaultAsync(b => b.Id == bookId);
         if (book is null)
@@ -83,6 +83,6 @@ public class LoanService : ILoanService
         book.Status = BookStatus.Available;
 
         await _db.SaveChangesAsync();
-        await tx.CommitAsync();
+        //await tx.CommitAsync();
     }
 }

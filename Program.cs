@@ -14,7 +14,10 @@ builder.Services.AddControllersWithViews(options =>
 
 builder.Services.AddDbContext<LibraryBuddyDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("Default"),
+        sql => sql.EnableRetryOnFailure()
+    );
 });
 
 // Dependency Injection
