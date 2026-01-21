@@ -1,0 +1,28 @@
+﻿@model LibraryBuddy.ViewModels.Loans.LoanReturnVm
+@{
+    ViewData["Title"] = "Return Book";
+}
+
+<h2>Return Book</h2>
+
+<div class="mb-2"><b>Book:</b> @Model.BookTitle</div>
+
+<form asp-action="Return" method="post" class="mt-3">
+    <input asp-for="BookId" type="hidden" />
+    <input asp-for="BookTitle" type="hidden" />
+
+    <div asp-validation-summary="All" class="text-danger mb-2"></div>
+
+    <div class="mb-3">
+        <label class="form-label">Return date</label>
+        <input asp-for="ReturnedOn" type="date" class="form-control" />
+        <span asp-validation-for="ReturnedOn" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-warning" type="submit">Return</button>
+    <a class="btn btn-secondary" asp-controller="Books" asp-action="Details" asp-route-id="@Model.BookId">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

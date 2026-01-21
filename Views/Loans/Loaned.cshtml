@@ -1,0 +1,32 @@
+﻿@model IReadOnlyList<LibraryBuddy.Domain.Entities.Loan>
+
+@{
+    ViewData["Title"] = "Currently Loaned";
+}
+
+<h2>Currently Loaned</h2>
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Book</th>
+            <th>Borrower</th>
+            <th>Loaned on</th>
+            <th style="width:180px;"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var l in Model)
+        {
+            <tr>
+                <td>@(l.Book?.Title) — @(l.Book?.Author)</td>
+                <td>@l.BorrowerName</td>
+                <td>@l.LoanedOn</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-primary" asp-controller="Books" asp-action="Details" asp-route-id="@l.BookId">Details</a>
+                    <a class="btn btn-sm btn-warning" asp-controller="Loans" asp-action="Return" asp-route-bookId="@l.BookId">Return</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
