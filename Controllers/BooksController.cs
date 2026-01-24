@@ -17,9 +17,16 @@ public class BooksController : Controller
         _loans = loans;
     }
 
-    public async Task<IActionResult> Index(string? q, string? genre, BookStatus? status)
+    public async Task<IActionResult> Index(
+    string? q,
+    string? genre,
+    BookStatus? status,
+    int page = 1)
     {
-        var (items, genres) = await _books.SearchAsync(q, genre, status);
+        const int pageSize = 5;
+
+        var (result, genres) =
+            await _books.SearchAsync(q, genre, status, page, pageSize);
 
         var vm = new BookListVm
         {
@@ -30,11 +37,14 @@ public class BooksController : Controller
                 Status = status,
                 Genres = genres.ToList()
             },
-            Items = items.ToList()
+            Items = result.Items,
+            Page = result.Page,
+            TotalPages = result.TotalPages
         };
 
         return View(vm);
     }
+
 
     public async Task<IActionResult> Details(int id)
     {

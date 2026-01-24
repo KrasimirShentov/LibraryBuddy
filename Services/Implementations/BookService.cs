@@ -2,6 +2,7 @@
 using LibraryBuddy.Domain.Entities;
 using LibraryBuddy.Domain.Enums;
 using LibraryBuddy.Services.Interfaces;
+using LibraryBuddy.ViewModels.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryBuddy.Services.Implementations;
@@ -15,37 +16,56 @@ public class BookService : IBookService
     public Task<Book?> GetByIdAsync(int id) =>
         _db.Books.Include(b => b.Loans).FirstOrDefaultAsync(b => b.Id == id);
 
-    public async Task<(IReadOnlyList<Book> Items, IReadOnlyList<string> Genres)> SearchAsync(
-        string? q, string? genre, BookStatus? status)
+    public async Task<(PagedResult<Book> Result, IReadOnlyList<string> Genres)> SearchAsync(
+    string? q,
+    string? genre,
+    BookStatus? status,
+    int page,
+    int pageSize)
     {
-        var baseQuery = _db.Books.AsNoTracking();
+        var query = _db.Books.AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(q))
         {
             var term = q.Trim();
-            baseQuery = baseQuery.Where(b =>
+            query = query.Where(b =>
                 b.Title.Contains(term) || b.Author.Contains(term));
         }
 
         if (!string.IsNullOrWhiteSpace(genre))
-            baseQuery = baseQuery.Where(b => b.Genre == genre);
+            query = query.Where(b => b.Genre == genre);
 
         if (status is not null)
-            baseQuery = baseQuery.Where(b => b.Status == status);
+            query = query.Where(b => b.Status == status);
 
-        var items = await baseQuery
+        var totalItems = await query.CountAsync();
+
+        var items = await query
             .OrderBy(b => b.Title)
             .ThenBy(b => b.Author)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
 
-        var genres = await _db.Books.AsNoTracking()
+        var genres = await _db.Books
+            .AsNoTracking()
             .Select(b => b.Genre)
             .Distinct()
             .OrderBy(g => g)
             .ToListAsync();
 
-        return (items, genres);
+        return (
+            new PagedResult<Book>
+            {
+                Items = items,
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            },
+            genres
+        );
     }
+
 
     public async Task<Book> CreateAsync(Book book)
     {
